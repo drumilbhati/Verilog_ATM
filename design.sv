@@ -103,4 +103,129 @@ module atm_module (
         end
     endfunction
 
+    // task to log each transaction
+    task log_transaction;
+        input [15:0] card_num;
+        input [15:0] transaction_type;
+        input [15:0] transaction_amount;
+        begin
+            transaction_history[transaction_ptr] = {card_num[3:0], transaction_type[3:0], transaction_amount};
+            transaction_ptr = transaction_ptr + 1;
+            transaction_count = transaction_count + 1;
+        end
+    endtask
+
+    always @(*) begin
+        next_state = state;
+        transaction_success = 0;
+        error_code = NO_ERROR;
+
+        case (state)
+            IDLE: begin
+                if (card_inserted) begin
+                    next_state = CARD_INSERT;
+                    current_card_number = amount;
+                end
+            end
+
+            CARD_INSERT: begin
+                if (validate_card(current_card_number) == 16'h0001) begin
+                    next_state = CARD_VALID;
+                    stored_pin = card_data[current_card_number][CARD_PIN_IDX];
+                    daily_limit = card_data[current_card_number][CARD_LIMIT_IDX];
+                end else begin
+                    next_state = CARD_ERROR;
+                    error_code = INVALID_CARD;
+                end
+            end
+
+            CARD_VALID: begin
+                next_state = PIN_ENTRY;
+            end
+
+            PIN_ENTRY: begin
+                next_state = PIN_CHECK;
+            end
+
+            PIN_CHECK: begin
+                if (check_pin(pin_input, current_card_number) == 16'h001) begin
+                    next_state = MENU;
+                end else begin
+                    next_state = PIN_ERROR;
+                    error_code = INVALID_PIN;
+                end
+            end
+            
+            MENU: begin
+                if (balance_req)
+                    next_state = BALANCE_ENQ;
+                else if (withdrawal_req)
+                    next_state = WITHDRAWAL;
+                else if (deposit_req)
+                    next_state = DEPOSIT;
+                else if (pin_change_req)
+                    next_state = PIN_CHANGE;
+            end
+
+            BALANCE_ENQ: begin
+                balance = card_data[current_card_number][CARD_BALANCE_IDX];
+                if (transaction_done) begin
+                    next_state = MENU;
+                    log_transaction(current_card_number, 16'h0001, 16'h0000);
+                end
+            end
+
+            WITHDRAWAL: begin
+                if (amount <= card_data[current_card_number][CARD_BALANCE_IDX]) begin
+                    if (amount <= daily_limit)
+                    next_state = AMOUNT_VALID;
+                    card_data[current_card_number][CARD_BALANCE_IDX] -= amount;
+                    log_transaction(current_card_number, 16'h002, amount);
+                    transaction_success = 1;
+                end else begin
+                    next_state = MENU;
+                    error_code = LIMIT_EXCEED;
+                end
+            end else begin
+                next_state = MENU;
+                error_code = INSUF_BALANCE;
+            end
+
+            DEPOSIT: begin
+                next_state = AMOUNT_VALID;
+                card_data[current_card_number][CARD_BALANCE_IDX] += amount;
+                log_transaction(current_card_number, 16'h0003, amount);
+                transaction_success = 1;
+            end
+            
+            PIN_CHANGE: begin
+                next_state = NEW_PIN_ENTRY;
+            end
+
+            NEW_PIN_ENTRY: begin
+                card_data[current_card_number][CARD_PIN_IDX] = pin_input;
+                log_transaction(current_card_number, 16'h0004, 16'h0000);
+                next_state = MENU;
+                transaction_success = 1;
+            end
+
+            AMOUNT_VALID: begin
+                next_state = PRINT_RECEIPT;
+            end
+
+            PRINT_RECEIPT: begin
+                if (transaction_done)
+                    next_state = MENU;
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+    always @(posedge clk) begin
+        current_state <= state;
+    end
+
 endmodule
