@@ -1,0 +1,9 @@
+1234  A0B0  0001  0500  // Card 0: PIN=1234, Balance=A0B0, Status=1 (Active), Daily Limit=0500
+5678  5FA0  0001  0300  // Card 1: PIN=5678, Balance=5FA0, Status=1 (Active), Daily Limit=0300
+9ABC  FFFF  0000  0000  // Card 2: PIN=9ABC, Balance=FFFF, Status=0 (Inactive), Daily Limit=0000
+1122  00FF  0001  0200  // Card 3: PIN=1122, Balance=00FF, Status=1 (Active), Daily Limit=0200
+3344  1B2C  0001  0400  // Card 4: PIN=3344, Balance=1B2C, Status=1 (Active), Daily Limit=0400
+5566  F00D  0001  0700  // Card 5: PIN=5566, Balance=F00D, Status=1 (Active), Daily Limit=0700
+7788  0ABC  0000  0000  // Card 6: PIN=7788, Balance=0ABC, Status=0 (Inactive), Daily Limit=0000
+99AA  AAAA  0001  0600  // Card 7: PIN=99AA, Balance=AAAA, Status=1 (Active), Daily Limit=0600
+BBCC  BEEF  0001  0800  // Card 8: PIN=BBCC, Balance=BEEF, Status=1 (Active), Daily Limit=0800
