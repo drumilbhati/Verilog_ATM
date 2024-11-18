@@ -60,14 +60,15 @@ module tb_atm_module;
         // Reset sequence
         #20 rst_n = 1;
         
-        // Test Case 1: Valid card and PIN
+        // Test Case 1: Valid card and PIN sequence
         #20;
         card_number_input = 8'h00; // Card 0 (PIN=1234)
         card_inserted = 1;
-        #20 card_inserted = 0;
+        #20;
         
-        #20 pin_input = 16'h1234; // Correct PIN
-        #40; // Wait for PIN verification
+        // Enter PIN
+        pin_input = 16'h1234; // Correct PIN
+        #40;
         
         // Check balance
         balance_req = 1;
@@ -82,14 +83,34 @@ module tb_atm_module;
         #20 transaction_done = 1;
         #20 transaction_done = 0;
 
-        // Test Case 2: Invalid PIN
+        // Test Case 2: Invalid PIN sequence
         #40;
         card_number_input = 8'h01; // Card 1
-        card_inserted = 1;
-        #20 card_inserted = 0;
+        #20;
         
-        #20 pin_input = 16'h0000; // Wrong PIN
-        #40; // Wait for PIN verification
+        pin_input = 16'h0000; // Wrong PIN
+        #40;
+        
+        // Test timeout
+        #300;
+        
+        // Test card removal during transaction
+        card_inserted = 0;
+        #20;
+        
+        // Test invalid card
+        #20 card_number_input = 8'h02; // Inactive card
+        card_inserted = 1;
+        #40;
+
+        // Test deposit
+        #20 card_number_input = 8'h00;
+        #20 pin_input = 16'h1234;
+        #40 deposit_req = 1;
+        amount = 16'h0100;
+        #20 deposit_req = 0;
+        #20 transaction_done = 1;
+        #20 transaction_done = 0;
 
         // End simulation
         #100 $finish;
@@ -97,8 +118,12 @@ module tb_atm_module;
 
     // Monitor outputs
     initial begin
-        $monitor("Time=%0t rst_n=%b card_inserted=%b pin_input=%h current_state=%d balance=%h success=%b error=%h",
-                 $time, rst_n, card_inserted, pin_input, current_state, balance, transaction_success, error_code);
+        $monitor("Time=%0t State=%h Card=%h Pin=%h Error=%h Balance=%h Success=%b",
+                 $time, current_state, card_number_input, pin_input, error_code,
+                 balance, transaction_success);
+                 
+        // Create VCD file for waveform viewing
+        $dumpfile("atm_test.vcd");
+        $dumpvars(0, tb_atm_module);
     end
-
 endmodule

@@ -1,0 +1,650 @@
+$date
+	Mon Nov 18 09:01:00 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tb_atm_module $end
+$var wire 1 ! transaction_success $end
+$var wire 8 " error_code [7:0] $end
+$var wire 8 # current_state [7:0] $end
+$var wire 16 $ balance [15:0] $end
+$var reg 16 % amount [15:0] $end
+$var reg 1 & balance_req $end
+$var reg 1 ' card_inserted $end
+$var reg 8 ( card_number_input [7:0] $end
+$var reg 1 ) clk $end
+$var reg 1 * deposit_req $end
+$var reg 1 + pin_change_req $end
+$var reg 16 , pin_input [15:0] $end
+$var reg 1 - rst_n $end
+$var reg 1 . transaction_done $end
+$var reg 1 / withdrawal_req $end
+$scope module uut $end
+$var wire 16 0 amount [15:0] $end
+$var wire 1 & balance_req $end
+$var wire 1 ' card_inserted $end
+$var wire 8 1 card_number_input [7:0] $end
+$var wire 1 ) clk $end
+$var wire 1 * deposit_req $end
+$var wire 1 + pin_change_req $end
+$var wire 16 2 pin_input [15:0] $end
+$var wire 1 - rst_n $end
+$var wire 1 . transaction_done $end
+$var wire 1 / withdrawal_req $end
+$var parameter 8 3 AMOUNT_VALID $end
+$var parameter 8 4 BALANCE_ENQ $end
+$var parameter 32 5 CARD_BALANCE_IDX $end
+$var parameter 8 6 CARD_ERROR $end
+$var parameter 8 7 CARD_INSERT $end
+$var parameter 32 8 CARD_LIMIT_IDX $end
+$var parameter 32 9 CARD_PIN_IDX $end
+$var parameter 32 : CARD_STATUS_IDX $end
+$var parameter 8 ; CARD_VALID $end
+$var parameter 8 < CARD_VALIDATE $end
+$var parameter 8 = DEPOSIT $end
+$var parameter 8 > IDLE $end
+$var parameter 8 ? INSUF_BALANCE $end
+$var parameter 8 @ INVALID_CARD $end
+$var parameter 8 A INVALID_PIN $end
+$var parameter 8 B LIMIT_EXCEED $end
+$var parameter 8 C MENU $end
+$var parameter 8 D NO_ERROR $end
+$var parameter 8 E PIN_CHANGE $end
+$var parameter 8 F PIN_CHECK $end
+$var parameter 8 G PIN_ENTRY $end
+$var parameter 8 H PIN_ERROR $end
+$var parameter 8 I PIN_VALID $end
+$var parameter 8 J PRINT_RECEIPT $end
+$var parameter 8 K WITHDRAWAL $end
+$var reg 16 L balance [15:0] $end
+$var reg 8 M current_card_number [7:0] $end
+$var reg 8 N current_state [7:0] $end
+$var reg 16 O daily_limit [15:0] $end
+$var reg 8 P error_code [7:0] $end
+$var reg 8 Q next_state [7:0] $end
+$var reg 3 R pin_attempts [2:0] $end
+$var reg 1 S pin_valid $end
+$var reg 16 T stored_pin [15:0] $end
+$var reg 1 ! transaction_success $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10001 K
+b10101 J
+b1000 I
+b111 H
+b101 G
+b110 F
+b10011 E
+b0 D
+b1001 C
+b100 B
+b10 A
+b1 @
+b11 ?
+b0 >
+b10010 =
+b10 <
+b100 ;
+b10 :
+b0 9
+b11 8
+b1 7
+b11 6
+b1 5
+b10000 4
+b10100 3
+$end
+#0
+$dumpvars
+b0 T
+0S
+b0 R
+b0 Q
+b0 P
+b0 O
+b0 N
+b0 M
+b0 L
+b0 2
+b0 1
+b0 0
+0/
+0.
+0-
+b0 ,
+0+
+0*
+0)
+b0 (
+0'
+0&
+b0 %
+b0 $
+b0 #
+b0 "
+0!
+$end
+#5
+1)
+#10
+0)
+#15
+1)
+#20
+0)
+1-
+#25
+1)
+#30
+0)
+#35
+1)
+#40
+b1 Q
+0)
+1'
+#45
+b1 #
+b1 N
+b10 Q
+1)
+#50
+0)
+#55
+b100 Q
+b10 #
+b10 N
+1)
+#60
+b100 Q
+0)
+b1001000110100 ,
+b1001000110100 2
+#65
+b101 Q
+b10100000000 O
+b1001000110100 T
+b100 #
+b100 N
+1)
+#70
+0)
+#75
+b101 #
+b101 N
+b110 Q
+1)
+#80
+0)
+#85
+1S
+b110 #
+b110 N
+b1001 Q
+1)
+#90
+0)
+#95
+b1001 #
+b1001 N
+b1001 Q
+1)
+#100
+b10000 Q
+0)
+1&
+#105
+b10000 #
+b10000 N
+1)
+#110
+0)
+#115
+b1010000010110000 $
+b1010000010110000 L
+1)
+#120
+0)
+0&
+#125
+1)
+#130
+0)
+#135
+1)
+#140
+b10101 Q
+0)
+1.
+#145
+b1001 Q
+1!
+b10101 #
+b10101 N
+1)
+#150
+0)
+#155
+b1001 #
+b1001 N
+1)
+#160
+0)
+0.
+#165
+1)
+#170
+0)
+#175
+1)
+#180
+b10001 Q
+0)
+b1010000 %
+b1010000 0
+1/
+#185
+b1001 Q
+b10001 #
+b10001 N
+1)
+#190
+0)
+#195
+b10001 Q
+b1001 #
+b1001 N
+1)
+#200
+b1001 Q
+0)
+0/
+#205
+1)
+#210
+0)
+#215
+1)
+#220
+0)
+1.
+#225
+1)
+#230
+0)
+#235
+1)
+#240
+0)
+0.
+#245
+1)
+#250
+0)
+#255
+1)
+#260
+0)
+#265
+1)
+#270
+0)
+#275
+1)
+#280
+0)
+b1 (
+b1 1
+#285
+1)
+#290
+0)
+#295
+1)
+#300
+0)
+b0 ,
+b0 2
+#305
+1)
+#310
+0)
+#315
+1)
+#320
+0)
+#325
+1)
+#330
+0)
+#335
+1)
+#340
+0)
+#345
+1)
+#350
+0)
+#355
+1)
+#360
+0)
+#365
+1)
+#370
+0)
+#375
+1)
+#380
+0)
+#385
+1)
+#390
+0)
+#395
+1)
+#400
+0)
+#405
+1)
+#410
+0)
+#415
+1)
+#420
+0)
+#425
+1)
+#430
+0)
+#435
+1)
+#440
+0)
+#445
+1)
+#450
+0)
+#455
+1)
+#460
+0)
+#465
+1)
+#470
+0)
+#475
+1)
+#480
+0)
+#485
+1)
+#490
+0)
+#495
+1)
+#500
+0)
+#505
+1)
+#510
+0)
+#515
+1)
+#520
+0)
+#525
+1)
+#530
+0)
+#535
+1)
+#540
+0)
+#545
+1)
+#550
+0)
+#555
+1)
+#560
+0)
+#565
+1)
+#570
+0)
+#575
+1)
+#580
+0)
+#585
+1)
+#590
+0)
+#595
+1)
+#600
+0)
+#605
+1)
+#610
+0)
+#615
+1)
+#620
+0)
+#625
+1)
+#630
+0)
+#635
+1)
+#640
+0)
+0'
+#645
+b0 Q
+1)
+#650
+0)
+#655
+b0 #
+b0 N
+1)
+#660
+0)
+#665
+1)
+#670
+0)
+#675
+1)
+#680
+b1 Q
+0)
+1'
+b10 (
+b10 1
+#685
+b1 #
+b1 N
+b10 Q
+1)
+#690
+0)
+#695
+b11 Q
+0!
+b10 M
+b10 #
+b10 N
+1)
+#700
+0)
+#705
+b1 "
+b1 P
+b11 #
+b11 N
+1)
+#710
+0)
+#715
+b0 Q
+1)
+#720
+0)
+#725
+b1 Q
+b0 #
+b0 N
+1)
+#730
+0)
+#735
+b1 #
+b1 N
+b10 Q
+1)
+#740
+0)
+b0 (
+b0 1
+#745
+b100 Q
+b0 "
+b0 P
+b0 M
+b10 #
+b10 N
+1)
+#750
+0)
+#755
+b101 Q
+b100 #
+b100 N
+1)
+#760
+b101 Q
+0)
+b1001000110100 ,
+b1001000110100 2
+#765
+b101 #
+b101 N
+b110 Q
+1)
+#770
+0)
+#775
+b110 #
+b110 N
+b1001 Q
+1)
+#780
+0)
+#785
+b1001 #
+b1001 N
+b1001 Q
+1)
+#790
+0)
+#795
+1)
+#800
+b10010 Q
+0)
+b100000000 %
+b100000000 0
+1*
+#805
+b10010 #
+b10010 N
+1)
+#810
+0)
+#815
+1)
+#820
+0)
+0*
+#825
+1)
+#830
+0)
+#835
+1)
+#840
+b10100 Q
+0)
+1.
+#845
+b10101 Q
+1!
+b1010000110110000 $
+b1010000110110000 L
+b10100 #
+b10100 N
+1)
+#850
+0)
+#855
+b1001 Q
+b10101 #
+b10101 N
+1)
+#860
+b1001 Q
+0)
+0.
+#865
+b1001 #
+b1001 N
+1)
+#870
+0)
+#875
+1)
+#880
+0)
+#885
+1)
+#890
+0)
+#895
+1)
+#900
+0)
+#905
+1)
+#910
+0)
+#915
+1)
+#920
+0)
+#925
+1)
+#930
+0)
+#935
+1)
+#940
+0)
+#945
+1)
+#950
+0)
+#955
+1)
+#960
+0)
