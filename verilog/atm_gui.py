@@ -1,134 +1,237 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import re
 import subprocess
 import tempfile
 import os
+from gui_api import ATMInputGenerator
 
-class ATM_GUI:
+class ATMApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ATM G31")
-        
+        self.root.title("ATM Banking System")
+        self.root.geometry("400x600")
+        self.root.configure(bg='#f0f0f0')
+
+        # Style configuration
+        self.style = ttk.Style()
+        self.style.configure('TLabel', background='#f0f0f0', font=('Arial', 10))
+        self.style.configure('TButton', font=('Arial', 10))
+        self.style.configure('Title.TLabel', font=('Arial', 16, 'bold'), foreground='#2c3e50')
+
+        # Input generator
+        self.generator = ATMInputGenerator()
+
+        # State variables
         self.card_number = tk.StringVar()
         self.pin = tk.StringVar()
         self.amount = tk.StringVar()
         self.new_pin = tk.StringVar()
-        self.card_inserted = False
-        self.pin_verified = False
-        self.current_state = "IDLE"
 
-        self.setup_gui()
-    
-    def setup_gui(self):
-        main_frame = ttk.Frame(self.root, padding="10")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        # Create main container
+        self.container = ttk.Frame(root, style='TFrame')
+        self.container.pack(fill='both', expand=True, padx=20, pady=20)
 
-        auth_frame = ttk.LabelFrame(main_frame, text="Card Authentication", padding="5")
-        auth_frame.grid(row=0, column=0, columnspan=2, pady=5, sticky=(tk.W, tk.E))
+        # Create frames for different stages
+        self.create_login_frame()
 
-        ttk.Label(auth_frame, text="Card Number:").grid(row=0, column=0, pady=5)
-        self.card_entry = ttk.Entry(auth_frame, textvariable=self.card_number)
-        self.card_entry.grid(row=0, column=1, pady=5)
-        
-        ttk.Label(auth_frame, text="PIN:").grid(row=1, column=0, pady=5)
-        self.pin_entry = ttk.Entry(auth_frame, textvariable=self.pin, show="*")
-        self.pin_entry.grid(row=1, column=1, pady=5)
+    def create_login_frame(self):
+        # Clear existing widgets
+        for widget in self.container.winfo_children():
+            widget.destroy()
 
-        self.validate_btn = ttk.Button(auth_frame, text="Validate Card & PIN", command=self.validate_card_and_pin)
-        self.validate_btn.grid(row=2, column=0, columnspan=2, pady=5)
+        # Login Frame
+        login_frame = ttk.Frame(self.container)
+        login_frame.pack(fill='both', expand=True)
 
-        transaction_frame = ttk.LabelFrame(main_frame, text="Transaction", padding="5")
-        transaction_frame.grid(row=1, column=0, columnspan=2, pady=5, sticky=(tk.W, tk.E))
-        
-        ttk.Label(transaction_frame, text="Amount:").grid(row=0, column=0, pady=5)
-        self.amount_entry = ttk.Entry(transaction_frame, textvariable=self.amount)
-        self.amount_entry.grid(row=0, column=1, pady=5)
+        # Title
+        ttk.Label(login_frame, text="ATM Login", style='Title.TLabel').pack(pady=(20, 30))
 
-        ttk.Label(transaction_frame, text="New PIN:").grid(row=1, column=0, pady=5)
-        self.new_pin_entry = ttk.Entry(transaction_frame, textvariable=self.new_pin, show="*")
-        self.new_pin_entry.grid(row=1, column=1, pady=5)
+        # Card Number
+        card_label = ttk.Label(login_frame, text="Card Number:")
+        card_label.pack(pady=(10, 5))
+        card_entry = ttk.Entry(login_frame, textvariable=self.card_number, width=30)
+        card_entry.pack(pady=(0, 10))
 
-        menu_frame = ttk.LabelFrame(main_frame, text="Menu Options", padding="5")
-        menu_frame.grid(row=2, column=0, columnspan=2, pady=5, sticky=(tk.W, tk.E))
+        # PIN
+        pin_label = ttk.Label(login_frame, text="PIN:")
+        pin_label.pack(pady=(10, 5))
+        pin_entry = ttk.Entry(login_frame, textvariable=self.pin, show="*", width=30)
+        pin_entry.pack(pady=(0, 20))
 
-        self.menu_buttons = {
-            'balance': ttk.Button(menu_frame, text="Check Balance", command=self.check_balance),
-            'withdraw': ttk.Button(menu_frame, text="Withdraw", command=self.withdraw),
-            'deposit': ttk.Button(menu_frame, text="Deposit", command=self.deposit),
-            'pin_change': ttk.Button(menu_frame, text="Change PIN", command=self.change_pin),
-        }
+        # Login Button
+        login_button = ttk.Button(login_frame, text="Login", 
+                                  command=self.validate_login, 
+                                  style='Accent.TButton')
+        login_button.pack(pady=20)
 
-        row = 0
-        col = 0
-        for button in self.menu_buttons.values():
-            button.grid(row=row, column=col, padx=5, pady=5)
-            col += 1
-            if col > 1:
-                col = 0
-                row += 1
-
-        self.exit_btn = ttk.Button(main_frame, text="Exit / Remove Card", command=self.exit_atm)
-        self.exit_btn.grid(row=3, column=0, columnspan=2, pady=10)
-
-        # Initialize GUI state
-        self.update_gui_state()
-
-    def validate_card_and_pin(self):
-        if not self.card_number.get().isdigit():
-            messagebox.showerror("Error", "Invalid card number")
+    def validate_login(self):
+        # Validate card number and PIN format
+        if not re.match(r'^\d{8}$', self.card_number.get()):
+            messagebox.showerror("Error", "Card number must be 8 digits")
             return
-            
-        if not self.pin.get().isdigit() or len(self.pin.get()) != 4:
-            messagebox.showerror("Error", "Invalid PIN format")
+        
+        if not re.match(r'^\d{4}$', self.pin.get()):
+            messagebox.showerror("Error", "PIN must be 4 digits")
             return
-    
-        testbench_path = self.create_verilog_testbench("validate")
+
+        # Run Verilog simulation for validation
+        try:
+            testbench_path = self.create_verilog_testbench("validate")
+            output = self.run_verilog_simulation(testbench_path)
+
+            if output:
+                state, balance, success, error = self.parse_simulation_results(output)
+                
+                if success:
+                    # Move to transaction window
+                    self.create_transaction_frame(balance)
+                elif error:
+                    self.handle_error(error)
+                else:
+                    messagebox.showerror("Error", "Invalid card or PIN")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    def create_transaction_frame(self, balance):
+        # Clear existing widgets
+        for widget in self.container.winfo_children():
+            widget.destroy()
+
+        # Transaction Frame
+        transaction_frame = ttk.Frame(self.container)
+        transaction_frame.pack(fill='both', expand=True)
+
+        # Title and Balance
+        ttk.Label(transaction_frame, text="ATM Transactions", 
+                  style='Title.TLabel').pack(pady=(20, 10))
+        ttk.Label(transaction_frame, 
+                  text=f"Current Balance: ${balance}", 
+                  font=('Arial', 12)).pack(pady=(0, 20))
+
+        # Transaction Buttons
+        transaction_options = [
+            ("Check Balance", self.check_balance),
+            ("Withdraw", self.withdraw),
+            ("Deposit", self.deposit),
+            ("Change PIN", self.change_pin),
+            ("Exit", self.exit_atm)
+        ]
+
+        for label, command in transaction_options:
+            btn = ttk.Button(transaction_frame, text=label, 
+                             command=command, width=30)
+            btn.pack(pady=10)
+
+    def check_balance(self):
+        testbench_path = self.create_verilog_testbench("balance")
         output = self.run_verilog_simulation(testbench_path)
-
+        
         if output:
             state, balance, success, error = self.parse_simulation_results(output)
-        
             if error:
                 self.handle_error(error)
-                self.pin_verified = False
             elif success:
-                messagebox.showinfo("Success", "Card and PIN verified successfully")
-                self.card_inserted = True
-                self.pin_verified = True
-                self.current_state = "MENU"
-            else:
-                messagebox.showerror("Error", "Invalid card or PIN")
-                self.pin_verified = False
-            
-            self.update_gui_state()
+                messagebox.showinfo("Balance", f"Your balance is ${balance}")
 
-    def update_gui_state(self):
-        auth_state = 'normal' if self.current_state == "IDLE" else 'disabled'
-        self.card_entry.config(state=auth_state)
-        self.pin_entry.config(state=auth_state)
-        self.validate_btn.config(state=auth_state)
-        
-        menu_state = 'normal' if self.pin_verified else 'disabled'
-        for button in self.menu_buttons.values():
-            button.config(state=menu_state)
-            
-        self.amount_entry.config(state=menu_state)
-        self.new_pin_entry.config(state=menu_state)
+    def withdraw(self):
+        # Create withdraw amount popup
+        withdraw_window = tk.Toplevel(self.root)
+        withdraw_window.title("Withdraw")
+        withdraw_window.geometry("300x200")
 
-    def handle_error(self, error_code):
-        error_messages = {
-            1: "Invalid card number",
-            2: "Invalid PIN",
-            3: "Insufficient funds",
-            4: "Invalid amount",
-            5: "Card blocked",
-            6: "System error"
-        }
-        message = error_messages.get(error_code, "Unknown error")
-        messagebox.showerror("Error", message)
+        ttk.Label(withdraw_window, text="Enter Withdrawal Amount:").pack(pady=(20, 10))
+        amount_entry = ttk.Entry(withdraw_window, textvariable=self.amount)
+        amount_entry.pack(pady=(0, 10))
+        amount_entry.focus()
+
+        def process_withdrawal():
+            if not re.match(r'^\d+$', self.amount.get()):
+                messagebox.showerror("Error", "Invalid amount")
+                return
+            
+            testbench_path = self.create_verilog_testbench("withdraw")
+            output = self.run_verilog_simulation(testbench_path)
+            
+            if output:
+                state, balance, success, error = self.parse_simulation_results(output)
+                if error:
+                    self.handle_error(error)
+                elif success:
+                    messagebox.showinfo("Success", f"Withdrawal successful\nRemaining balance: ${balance}")
+                    withdraw_window.destroy()
+
+        ttk.Button(withdraw_window, text="Withdraw", command=process_withdrawal).pack(pady=10)
+
+    def deposit(self):
+        # Create deposit amount popup
+        deposit_window = tk.Toplevel(self.root)
+        deposit_window.title("Deposit")
+        deposit_window.geometry("300x200")
+
+        ttk.Label(deposit_window, text="Enter Deposit Amount:").pack(pady=(20, 10))
+        amount_entry = ttk.Entry(deposit_window, textvariable=self.amount)
+        amount_entry.pack(pady=(0, 10))
+        amount_entry.focus()
+
+        def process_deposit():
+            if not re.match(r'^\d+$', self.amount.get()):
+                messagebox.showerror("Error", "Invalid amount")
+                return
+            
+            testbench_path = self.create_verilog_testbench("deposit")
+            output = self.run_verilog_simulation(testbench_path)
+            
+            if output:
+                state, balance, success, error = self.parse_simulation_results(output)
+                if error:
+                    self.handle_error(error)
+                elif success:
+                    messagebox.showinfo("Success", f"Deposit successful\nNew balance: ${balance}")
+                    deposit_window.destroy()
+
+        ttk.Button(deposit_window, text="Deposit", command=process_deposit).pack(pady=10)
+
+    def change_pin(self):
+        # Create change PIN popup
+        pin_window = tk.Toplevel(self.root)
+        pin_window.title("Change PIN")
+        pin_window.geometry("300x250")
+
+        ttk.Label(pin_window, text="Enter New PIN:").pack(pady=(20, 10))
+        new_pin_entry = ttk.Entry(pin_window, textvariable=self.new_pin, show="*")
+        new_pin_entry.pack(pady=(0, 10))
+        new_pin_entry.focus()
+
+        def process_pin_change():
+            if not re.match(r'^\d{4}$', self.new_pin.get()):
+                messagebox.showerror("Error", "New PIN must be 4 digits")
+                return
+            
+            testbench_path = self.create_verilog_testbench("pin_change")
+            output = self.run_verilog_simulation(testbench_path)
+            
+            if output:
+                state, balance, success, error = self.parse_simulation_results(output)
+                if error:
+                    self.handle_error(error)
+                elif success:
+                    messagebox.showinfo("Success", "PIN changed successfully")
+                    pin_window.destroy()
+                    self.exit_atm()
+
+        ttk.Button(pin_window, text="Change PIN", command=process_pin_change).pack(pady=10)
+
+    def exit_atm(self):
+        # Reset variables and go back to login screen
+        self.card_number.set("")
+        self.pin.set("")
+        self.amount.set("")
+        self.new_pin.set("")
+        self.create_login_frame()
 
     def create_verilog_testbench(self, operation):
-        testbench = """
+        testbench = f"""
         `timescale 1ns/1ps
         
         module atm_tb;
@@ -186,41 +289,36 @@ class ATM_GUI:
                 #10 rst_n = 1;
                 
                 // Insert card and validate
-                if ("{operation}" == "validate") begin
-                    card_number_input = {card_number};
-                    #10 card_inserted = 1;
-                    #20 pin_input = {pin};
-                    #30;  // Wait for validation
-                end
-                else begin
-                    // For other operations, ensure we're in a valid state first
-                    card_number_input = {card_number};
-                    #10 card_inserted = 1;
-                    #20 pin_input = {pin};
-                    #30;  // Wait for PIN verification
-                    
-                    case ("{operation}")
-                        "balance": begin
-                            #10 balance_req = 1;
-                            #20 transaction_done = 1;
-                        end
-                        "withdraw": begin
-                            #10 withdrawal_req = 1;
-                            amount = {amount};
-                            #20 transaction_done = 1;
-                        end
-                        "deposit": begin
-                            #10 deposit_req = 1;
-                            amount = {amount};
-                            #20 transaction_done = 1;
-                        end
-                        "pin_change": begin
-                            #10 pin_change_req = 1;
-                            pin_input = {new_pin};
-                            #20 transaction_done = 1;
-                        end
-                    endcase
-                end
+                card_number_input = {int(self.card_number.get())};
+                #10 card_inserted = 1;
+                #20 pin_input = {int(self.pin.get())};
+                #30;  // Wait for PIN verification
+                
+                case ("{operation}")
+                    "validate": begin
+                        // Just verify card and PIN
+                        #100;
+                    end
+                    "balance": begin
+                        #10 balance_req = 1;
+                        #20 transaction_done = 1;
+                    end
+                    "withdraw": begin
+                        #10 withdrawal_req = 1;
+                        amount = {int(self.amount.get()) if self.amount.get() else 0};
+                        #20 transaction_done = 1;
+                    end
+                    "deposit": begin
+                        #10 deposit_req = 1;
+                        amount = {int(self.amount.get()) if self.amount.get() else 0};
+                        #20 transaction_done = 1;
+                    end
+                    "pin_change": begin
+                        #10 pin_change_req = 1;
+                        pin_input = {int(self.new_pin.get()) if self.new_pin.get() else 0};
+                        #20 transaction_done = 1;
+                    end
+                endcase
                 
                 #100;  // Wait for operation to complete
                 
@@ -234,13 +332,7 @@ class ATM_GUI:
             always #5 clk = ~clk;
             
         endmodule
-        """.format(
-            card_number=self.card_number.get(),
-            pin=self.pin.get(),
-            amount=self.amount.get() if self.amount.get() else '0',
-            new_pin=self.new_pin.get() if self.new_pin.get() else '0',
-            operation=operation
-        )
+        """
         
         with tempfile.NamedTemporaryFile(mode='w', suffix='.v', delete=False) as f:
             f.write(testbench)
@@ -248,94 +340,27 @@ class ATM_GUI:
 
     def run_verilog_simulation(self, testbench_path):
         try:
-            # Compile Verilog files
-            subprocess.run(['iverilog', '-o', 'atm_sim', 'design.sv', testbench_path], check=True)
-            
-            # Run simulation
-            result = subprocess.run(['vvp', 'atm_sim'], capture_output=True, text=True, check=True)
-            
-            # Clean up
+            subprocess.run('iverilog -o atm_sim ${testbench_path} design.v')
+            result = subprocess.run('vvp atm_sim')
             os.remove(testbench_path)
-            os.remove('sim.vvp')
+            os.remove('atm_sim')
             
             return result.stdout
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Error", f"Simulation failed: {e}")
             return None
-    
-    def check_balance(self):
-        if not self.validate_state():
-            return
-            
-        testbench_path = self.create_verilog_testbench("balance")
-        output = self.run_verilog_simulation(testbench_path)
-        
-        if output:
-            state, balance, success, error = self.parse_simulation_results(output)
-            if error:
-                self.handle_error(error)
-            elif success:
-                messagebox.showinfo("Balance", f"Your balance is ${balance}")
 
-    def withdraw(self):
-        if not self.validate_state(check_amount=True):
-            return
-            
-        testbench_path = self.create_verilog_testbench("withdraw")
-        output = self.run_verilog_simulation(testbench_path)
-        
-        if output:
-            state, balance, success, error = self.parse_simulation_results(output)
-            if error:
-                self.handle_error(error)
-            elif success:
-                messagebox.showinfo("Success", f"Withdrawal successful\nRemaining balance: ${balance}")
-
-    def deposit(self):
-        if not self.validate_state(check_amount=True):
-            return
-            
-        testbench_path = self.create_verilog_testbench("deposit")
-        output = self.run_verilog_simulation(testbench_path)
-        
-        if output:
-            state, balance, success, error = self.parse_simulation_results(output)
-            if error:
-                self.handle_error(error)
-            elif success:
-                messagebox.showinfo("Success", f"Deposit successful\nNew balance: ${balance}")
-
-    def change_pin(self):
-        if not self.validate_state(check_new_pin=True):
-            return
-            
-        testbench_path = self.create_verilog_testbench("pin_change")
-        output = self.run_verilog_simulation(testbench_path)
-        
-        if output:
-            state, balance, success, error = self.parse_simulation_results(output)
-            if error:
-                self.handle_error(error)
-            elif success:
-                messagebox.showinfo("Success", "PIN changed successfully")
-                self.exit_atm()
-
-    def validate_state(self, check_amount=False, check_new_pin=False):
-        if not self.card_inserted or not self.pin_verified:
-            messagebox.showerror("Error", "Please validate card and PIN first")
-            return False
-            
-        if check_amount:
-            if not self.amount.get().isdigit() or int(self.amount.get()) <= 0:
-                messagebox.showerror("Error", "Invalid amount")
-                return False
-                
-        if check_new_pin:
-            if not self.new_pin.get().isdigit() or len(self.new_pin.get()) != 4:
-                messagebox.showerror("Error", "Invalid new PIN")
-                return False
-                
-        return True
+    def handle_error(self, error_code):
+        error_messages = {
+            1: "Invalid card number",
+            2: "Invalid PIN",
+            3: "Insufficient funds",
+            4: "Invalid amount",
+            5: "Card blocked",
+            6: "System error"
+        }
+        message = error_messages.get(error_code, "Unknown error")
+        messagebox.showerror("Error", message)
 
     def parse_simulation_results(self, output):
         state = None
@@ -355,18 +380,11 @@ class ATM_GUI:
                 
         return state, balance, success, error
 
-    def exit_atm(self):
-        self.card_number.set("")
-        self.pin.set("")
-        self.amount.set("")
-        self.new_pin.set("")
-        self.card_inserted = False
-        self.pin_verified = False
-        self.current_state = "IDLE"
-        self.update_gui_state()
-        messagebox.showinfo("Exit", "Thank you for using the ATM")
+def main():
+    root = tk.Tk()
+    root.resizable(False, False)
+    app = ATMApp(root)
+    root.mainloop()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = ATM_GUI(root)
-    root.mainloop()
+    main()
