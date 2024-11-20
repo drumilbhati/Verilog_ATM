@@ -6,4 +6,4 @@
 5566  F00D  0001  0700  // Card 5: PIN=5566, Balance=F00D, Status=1 (Active), Daily Limit=0700
 7788  0ABC  0000  0000  // Card 6: PIN=7788, Balance=0ABC, Status=0 (Inactive), Daily Limit=0000
 99AA  AAAA  0001  0600  // Card 7: PIN=99AA, Balance=AAAA, Status=1 (Active), Daily Limit=0600
-BBCC  BEEF  0001  0800  // Card 8: PIN=BBCC, Balance=BEEF, Status=1 (Active), Daily Limit=0800
+BBCC  BEEE  0001  0800  // Card 8: PIN=BBCC, Balance=BEEE, Status=1 (Active), Daily Limit=0800
