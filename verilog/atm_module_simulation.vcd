@@ -1,0 +1,228 @@
+$date
+	Fri Nov 22 07:55:46 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_atm_module $end
+$var wire 1 ! transaction_success $end
+$var wire 8 " error_code [7:0] $end
+$var wire 8 # current_state [7:0] $end
+$var wire 16 $ balance [15:0] $end
+$var reg 16 % amount [15:0] $end
+$var reg 1 & balance_req $end
+$var reg 1 ' card_inserted $end
+$var reg 8 ( card_number_input [7:0] $end
+$var reg 1 ) clk $end
+$var reg 1 * deposit_req $end
+$var reg 1 + pin_change_req $end
+$var reg 16 , pin_input [15:0] $end
+$var reg 1 - rst_n $end
+$var reg 1 . transaction_done $end
+$var reg 160 / txn_type [160:1] $end
+$var reg 1 0 withdrawal_req $end
+$var integer 32 1 fd_in [31:0] $end
+$var integer 32 2 fd_out [31:0] $end
+$scope module uut $end
+$var wire 16 3 amount [15:0] $end
+$var wire 1 & balance_req $end
+$var wire 1 ' card_inserted $end
+$var wire 8 4 card_number_input [7:0] $end
+$var wire 1 ) clk $end
+$var wire 1 * deposit_req $end
+$var wire 1 + pin_change_req $end
+$var wire 16 5 pin_input [15:0] $end
+$var wire 1 - rst_n $end
+$var wire 1 . transaction_done $end
+$var wire 1 0 withdrawal_req $end
+$var parameter 8 6 AMOUNT_VALID $end
+$var parameter 8 7 BALANCE_ENQ $end
+$var parameter 32 8 CARD_BALANCE_IDX $end
+$var parameter 8 9 CARD_ERROR $end
+$var parameter 8 : CARD_INSERT $end
+$var parameter 32 ; CARD_LIMIT_IDX $end
+$var parameter 32 < CARD_PIN_IDX $end
+$var parameter 32 = CARD_STATUS_IDX $end
+$var parameter 8 > CARD_VALID $end
+$var parameter 8 ? CARD_VALIDATE $end
+$var parameter 8 @ DEPOSIT $end
+$var parameter 8 A IDLE $end
+$var parameter 8 B INSUF_BALANCE $end
+$var parameter 8 C INVALID_CARD $end
+$var parameter 8 D INVALID_PIN $end
+$var parameter 8 E LIMIT_EXCEED $end
+$var parameter 8 F MENU $end
+$var parameter 8 G NO_ERROR $end
+$var parameter 8 H PIN_CHANGE $end
+$var parameter 8 I PIN_CHECK $end
+$var parameter 8 J PIN_ENTRY $end
+$var parameter 8 K PIN_ERROR $end
+$var parameter 8 L PIN_VALID $end
+$var parameter 8 M PRINT_RECEIPT $end
+$var parameter 8 N WITHDRAWAL $end
+$var reg 16 O balance [15:0] $end
+$var reg 8 P current_card_number [7:0] $end
+$var reg 8 Q current_state [7:0] $end
+$var reg 16 R daily_limit [15:0] $end
+$var reg 8 S error_code [7:0] $end
+$var reg 8 T next_state [7:0] $end
+$var reg 3 U pin_attempts [2:0] $end
+$var reg 1 V pin_valid $end
+$var reg 16 W stored_pin [15:0] $end
+$var reg 1 ! transaction_success $end
+$var integer 32 X output_file [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10001 N
+b10101 M
+b1000 L
+b111 K
+b101 J
+b110 I
+b10011 H
+b0 G
+b1001 F
+b100 E
+b10 D
+b1 C
+b11 B
+b0 A
+b10010 @
+b10 ?
+b100 >
+b10 =
+b0 <
+b11 ;
+b1 :
+b11 9
+b1 8
+b10000 7
+b10100 6
+$end
+#0
+$dumpvars
+b10000000000000000000000000000011 X
+b0 W
+0V
+b0 U
+b0 T
+b0 S
+b0 R
+b0 Q
+b0 P
+b0 O
+bx 5
+bx 4
+bx 3
+bx 2
+bx 1
+00
+bx /
+0.
+0-
+bx ,
+0+
+0*
+0)
+bx (
+0'
+0&
+bx %
+b0 $
+b0 #
+b0 "
+0!
+$end
+#5000
+1)
+#10000
+0)
+1'
+b10000000000000000000000000000100 1
+1-
+#15000
+b1 T
+1)
+#20000
+0)
+1.
+#25000
+b1 #
+b1 Q
+1)
+#30000
+0)
+0.
+#35000
+b10 T
+bx P
+1)
+#40000
+0)
+b10000000000000000000000000000101 2
+0'
+#45000
+b10 #
+b10 Q
+1)
+#50000
+0)
+#55000
+b100 T
+bx R
+bx W
+1)
+#60000
+0)
+#65000
+b100 #
+b100 Q
+1)
+#70000
+0)
+#75000
+b101 T
+1)
+#80000
+0)
+#85000
+b101 #
+b101 Q
+1)
+#90000
+0)
+#95000
+b110 T
+1)
+#100000
+0)
+#105000
+b110 #
+b110 Q
+1)
+#110000
+0)
+#115000
+b111 T
+b1 U
+1)
+#120000
+0)
+#125000
+b10 U
+b111 #
+b111 Q
+1)
+#130000
+0)
+#135000
+b101 T
+1)
+#140000
+0)

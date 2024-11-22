@@ -1,5 +1,5 @@
 $date
-	Wed Nov 20 19:49:50 2024
+	Fri Nov 22 08:41:54 2024
 $end
 $version
 	Icarus Verilog
@@ -22,100 +22,104 @@ $var reg 1 + pin_change_req $end
 $var reg 16 , pin_input [15:0] $end
 $var reg 1 - rst_n $end
 $var reg 1 . transaction_done $end
-$var reg 1 / withdrawal_req $end
+$var reg 32 / transaction_type [31:0] $end
+$var reg 1 0 withdrawal_req $end
 $scope module uut $end
-$var wire 16 0 amount [15:0] $end
+$var wire 16 1 amount [15:0] $end
 $var wire 1 & balance_req $end
 $var wire 1 ' card_inserted $end
-$var wire 8 1 card_number_input [7:0] $end
+$var wire 8 2 card_number_input [7:0] $end
 $var wire 1 ) clk $end
 $var wire 1 * deposit_req $end
 $var wire 1 + pin_change_req $end
-$var wire 16 2 pin_input [15:0] $end
+$var wire 16 3 pin_input [15:0] $end
 $var wire 1 - rst_n $end
 $var wire 1 . transaction_done $end
-$var wire 1 / withdrawal_req $end
-$var parameter 8 3 AMOUNT_VALID $end
-$var parameter 8 4 BALANCE_ENQ $end
-$var parameter 32 5 CARD_BALANCE_IDX $end
-$var parameter 8 6 CARD_ERROR $end
-$var parameter 8 7 CARD_INSERT $end
-$var parameter 32 8 CARD_LIMIT_IDX $end
-$var parameter 32 9 CARD_PIN_IDX $end
-$var parameter 32 : CARD_STATUS_IDX $end
-$var parameter 8 ; CARD_VALID $end
-$var parameter 8 < CARD_VALIDATE $end
-$var parameter 8 = DEPOSIT $end
-$var parameter 8 > IDLE $end
-$var parameter 8 ? INSUF_BALANCE $end
-$var parameter 8 @ INVALID_CARD $end
-$var parameter 8 A INVALID_PIN $end
-$var parameter 8 B LIMIT_EXCEED $end
-$var parameter 8 C MENU $end
-$var parameter 8 D NO_ERROR $end
-$var parameter 8 E PIN_CHANGE $end
-$var parameter 8 F PIN_CHECK $end
-$var parameter 8 G PIN_ENTRY $end
-$var parameter 8 H PIN_ERROR $end
-$var parameter 8 I PIN_VALID $end
-$var parameter 8 J PRINT_RECEIPT $end
-$var parameter 8 K WITHDRAWAL $end
-$var reg 16 L balance [15:0] $end
-$var reg 8 M current_card_number [7:0] $end
-$var reg 8 N current_state [7:0] $end
-$var reg 16 O daily_limit [15:0] $end
-$var reg 8 P error_code [7:0] $end
-$var reg 8 Q next_state [7:0] $end
-$var reg 3 R pin_attempts [2:0] $end
-$var reg 1 S pin_valid $end
-$var reg 16 T stored_pin [15:0] $end
+$var wire 1 0 withdrawal_req $end
+$var parameter 8 4 AMOUNT_VALID $end
+$var parameter 8 5 BALANCE_ENQ $end
+$var parameter 32 6 CARD_BALANCE_IDX $end
+$var parameter 8 7 CARD_ERROR $end
+$var parameter 8 8 CARD_INSERT $end
+$var parameter 32 9 CARD_LIMIT_IDX $end
+$var parameter 32 : CARD_PIN_IDX $end
+$var parameter 32 ; CARD_STATUS_IDX $end
+$var parameter 8 < CARD_VALID $end
+$var parameter 8 = CARD_VALIDATE $end
+$var parameter 8 > DEPOSIT $end
+$var parameter 8 ? IDLE $end
+$var parameter 8 @ INSUF_BALANCE $end
+$var parameter 8 A INVALID_CARD $end
+$var parameter 8 B INVALID_PIN $end
+$var parameter 8 C LIMIT_EXCEED $end
+$var parameter 8 D MENU $end
+$var parameter 8 E NO_ERROR $end
+$var parameter 8 F PIN_CHANGE $end
+$var parameter 8 G PIN_CHECK $end
+$var parameter 8 H PIN_ENTRY $end
+$var parameter 8 I PIN_ERROR $end
+$var parameter 8 J PIN_VALID $end
+$var parameter 8 K PRINT_RECEIPT $end
+$var parameter 8 L WITHDRAWAL $end
+$var reg 16 M balance [15:0] $end
+$var reg 8 N current_card_number [7:0] $end
+$var reg 8 O current_state [7:0] $end
+$var reg 16 P daily_limit [15:0] $end
+$var reg 8 Q error_code [7:0] $end
+$var reg 8 R next_state [7:0] $end
+$var reg 3 S pin_attempts [2:0] $end
+$var reg 1 T pin_valid $end
+$var reg 16 U stored_pin [15:0] $end
 $var reg 1 ! transaction_success $end
+$var integer 32 V output_file [31:0] $end
 $upscope $end
 $upscope $end
 $enddefinitions $end
 $comment Show the parameter values. $end
 $dumpall
-b10001 K
-b10101 J
-b1000 I
-b111 H
-b101 G
-b110 F
-b10011 E
-b0 D
-b1001 C
-b100 B
-b10 A
-b1 @
-b11 ?
-b0 >
-b10010 =
-b10 <
-b100 ;
-b10 :
-b0 9
-b11 8
-b1 7
-b11 6
-b1 5
-b10000 4
-b10100 3
+b10001 L
+b10101 K
+b1000 J
+b111 I
+b101 H
+b110 G
+b10011 F
+b0 E
+b1001 D
+b100 C
+b10 B
+b1 A
+b11 @
+b0 ?
+b10010 >
+b10 =
+b100 <
+b10 ;
+b0 :
+b11 9
+b1 8
+b11 7
+b1 6
+b10000 5
+b10100 4
 $end
 #0
 $dumpvars
-b0 T
-0S
+b10000000000000000000000000000011 V
+b0 U
+0T
+b0 S
 b0 R
 b0 Q
 b0 P
 b0 O
 b0 N
 b0 M
-b0 L
+b0 3
 b0 2
 b0 1
-b0 0
-0/
+00
+b1001110011011110110111001100101 /
 0.
 0-
 b0 ,
@@ -147,93 +151,81 @@ $end
 #35
 1)
 #40
-b1 Q
 0)
 1'
 #45
-b1 #
-b1 N
-b10 Q
+b1 R
 1)
 #50
 0)
 #55
-b100 Q
-b10 #
-b10 N
+b1 #
+b1 O
 1)
 #60
-b100 Q
 0)
 b1001000110100 ,
-b1001000110100 2
+b1001000110100 3
 #65
-b101 Q
-b10100000000 O
-b1001000110100 T
-b100 #
-b100 N
+b10 R
 1)
 #70
 0)
 #75
-b101 #
-b101 N
-b110 Q
+b10 #
+b10 O
 1)
 #80
 0)
 #85
-1S
-b110 #
-b110 N
-b1001 Q
+b100 R
+b10100000000 P
+b1001000110100 U
 1)
 #90
 0)
 #95
-b1001 #
-b1001 N
-b1001 Q
+b100 #
+b100 O
 1)
 #100
-b10000 Q
+b1110101011010010111001001111001 /
 0)
 1&
 #105
-b10000 #
-b10000 N
+b101 R
 1)
 #110
 0)
 #115
-b1010000010110000 $
-b1010000010110000 L
+b101 #
+b101 O
 1)
 #120
+b1001110011011110110111001100101 /
 0)
 0&
 #125
+b110 R
 1)
 #130
 0)
 #135
+b110 #
+b110 O
 1)
 #140
-b10101 Q
 0)
 1.
 #145
-b1001 Q
-1!
-b10101 #
-b10101 N
+1T
+b1001 R
 1)
 #150
 0)
 #155
 b1001 #
-b1001 N
+b1001 O
 1)
 #160
 0)
@@ -245,27 +237,17 @@ b1001 N
 #175
 1)
 #180
-b10001 Q
 0)
-b1010000 %
-b1010000 0
-1/
 #185
-b1001 Q
-b10001 #
-b10001 N
 1)
 #190
 0)
 #195
-b10001 Q
-b1001 #
-b1001 N
 1)
 #200
-b1001 Q
 0)
-0/
+b1 (
+b1 2
 #205
 1)
 #210
@@ -274,7 +256,8 @@ b1001 Q
 1)
 #220
 0)
-1.
+b1000100010001 ,
+b1000100010001 3
 #225
 1)
 #230
@@ -283,7 +266,6 @@ b1001 Q
 1)
 #240
 0)
-0.
 #245
 1)
 #250
@@ -292,6 +274,8 @@ b1001 Q
 1)
 #260
 0)
+b10001000100010 ,
+b10001000100010 3
 #265
 1)
 #270
@@ -300,8 +284,6 @@ b1001 Q
 1)
 #280
 0)
-b1 (
-b1 1
 #285
 1)
 #290
@@ -310,8 +292,8 @@ b1 1
 1)
 #300
 0)
-b0 ,
-b0 2
+b11001100110011 ,
+b11001100110011 3
 #305
 1)
 #310
@@ -328,6 +310,10 @@ b0 2
 1)
 #340
 0)
+b1001000110100 ,
+b1001000110100 3
+b0 (
+b0 2
 #345
 1)
 #350
@@ -343,23 +329,38 @@ b0 2
 #375
 1)
 #380
+b1100001011101110110000101101100 /
 0)
+b1111111111111111 %
+b1111111111111111 1
+10
 #385
+b10001 R
 1)
 #390
 0)
 #395
+b10001 #
+b10001 O
 1)
 #400
+b1001110011011110110111001100101 /
 0)
+00
 #405
+b1001 R
+b100 "
+b100 Q
 1)
 #410
 0)
 #415
+b1001 #
+b1001 O
 1)
 #420
 0)
+1.
 #425
 1)
 #430
@@ -368,6 +369,7 @@ b0 2
 1)
 #440
 0)
+0.
 #445
 1)
 #450
@@ -383,15 +385,24 @@ b0 2
 #475
 1)
 #480
+b1100001011101110110000101101100 /
 0)
+b1010000 %
+b1010000 1
+10
 #485
+b10001 R
 1)
 #490
 0)
 #495
+b10001 #
+b10001 O
 1)
 #500
+b1001110011011110110111001100101 /
 0)
+00
 #505
 1)
 #510
@@ -400,14 +411,26 @@ b0 2
 1)
 #520
 0)
+1.
 #525
+b10100 R
+b0 "
+b0 Q
+1!
+b1010000001100000 $
+b1010000001100000 M
 1)
 #530
 0)
 #535
+b1010000000010000 $
+b1010000000010000 M
+b10100 #
+b10100 O
 1)
 #540
 0)
+0.
 #545
 1)
 #550
@@ -423,7 +446,11 @@ b0 2
 #575
 1)
 #580
+b1101111011100110110100101110100 /
 0)
+b100000000 %
+b100000000 1
+1*
 #585
 1)
 #590
@@ -431,7 +458,9 @@ b0 2
 #595
 1)
 #600
+b1001110011011110110111001100101 /
 0)
+0*
 #605
 1)
 #610
@@ -440,23 +469,27 @@ b0 2
 1)
 #620
 0)
+1.
 #625
+b10101 R
 1)
 #630
 0)
 #635
+b10101 #
+b10101 O
 1)
 #640
 0)
-0'
+0.
 #645
-b0 Q
+b1001 R
 1)
 #650
 0)
 #655
-b0 #
-b0 N
+b1001 #
+b1001 O
 1)
 #660
 0)
@@ -467,108 +500,72 @@ b0 N
 #675
 1)
 #680
-b1 Q
+b1100001011011100110011101100101 /
 0)
-1'
-b10 (
-b10 1
+b101011001111000 ,
+b101011001111000 3
+1+
 #685
-b1 #
-b1 N
-b10 Q
+b10011 R
 1)
 #690
 0)
 #695
-b11 Q
-0!
-b10 M
-b10 #
-b10 N
+b10011 #
+b10011 O
 1)
 #700
+b1001110011011110110111001100101 /
 0)
+0+
 #705
-b1 "
-b1 P
-b11 #
-b11 N
 1)
 #710
 0)
 #715
-b0 Q
 1)
 #720
 0)
+1.
 #725
-b1 Q
-b0 #
-b0 N
+b1001 R
 1)
 #730
 0)
 #735
-b1 #
-b1 N
-b10 Q
+b1001 #
+b1001 O
 1)
 #740
 0)
-b0 (
-b0 1
+0.
 #745
-b100 Q
-b0 "
-b0 P
-b0 M
-b10 #
-b10 N
 1)
 #750
 0)
 #755
-b101 Q
-b100 #
-b100 N
 1)
 #760
-b101 Q
 0)
-b1001000110100 ,
-b1001000110100 2
 #765
-b101 #
-b101 N
-b110 Q
 1)
 #770
 0)
 #775
-b110 #
-b110 N
-b1001 Q
 1)
 #780
 0)
+b11111111 (
+b11111111 2
 #785
-b1001 #
-b1001 N
-b1001 Q
 1)
 #790
 0)
 #795
 1)
 #800
-b10010 Q
 0)
-b100000000 %
-b100000000 0
-1*
 #805
-b10010 #
-b10010 N
 1)
 #810
 0)
@@ -576,7 +573,6 @@ b10010 N
 1)
 #820
 0)
-0*
 #825
 1)
 #830
@@ -584,31 +580,18 @@ b10010 N
 #835
 1)
 #840
-b10100 Q
 0)
-1.
 #845
-b10101 Q
-1!
-b1010000110110000 $
-b1010000110110000 L
-b10100 #
-b10100 N
 1)
 #850
 0)
 #855
-b1001 Q
-b10101 #
-b10101 N
 1)
 #860
-b1001 Q
 0)
-0.
+b0 (
+b0 2
 #865
-b1001 #
-b1001 N
 1)
 #870
 0)
@@ -616,6 +599,8 @@ b1001 N
 1)
 #880
 0)
+b1001000110100 ,
+b1001000110100 3
 #885
 1)
 #890
@@ -632,11 +617,15 @@ b1001 N
 1)
 #920
 0)
+0'
 #925
+b0 R
 1)
 #930
 0)
 #935
+b0 #
+b0 O
 1)
 #940
 0)
@@ -647,4 +636,44 @@ b1001 N
 #955
 1)
 #960
+0)
+#965
+1)
+#970
+0)
+#975
+1)
+#980
+0)
+#985
+1)
+#990
+0)
+#995
+1)
+#1000
+0)
+#1005
+1)
+#1010
+0)
+#1015
+1)
+#1020
+0)
+#1025
+1)
+#1030
+0)
+#1035
+1)
+#1040
+0)
+#1045
+1)
+#1050
+0)
+#1055
+1)
+#1060
 0)

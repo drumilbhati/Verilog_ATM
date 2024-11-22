@@ -27,11 +27,11 @@ module atm_module (
     parameter PIN_ERROR = 8'b0000_0111;
     parameter PIN_VALID = 8'b0000_1000;
     parameter MENU = 8'b0000_1001;
-    parameter BALANCE_ENQ   = 8'b0001_0000; 
-    parameter WITHDRAWAL    = 8'b0001_0001;
-    parameter DEPOSIT       = 8'b0001_0010;
-    parameter PIN_CHANGE    = 8'b0001_0011;
-    parameter AMOUNT_VALID  = 8'b0001_0100;
+    parameter BALANCE_ENQ = 8'b0001_0000;
+    parameter WITHDRAWAL = 8'b0001_0001;
+    parameter DEPOSIT = 8'b0001_0010;
+    parameter PIN_CHANGE = 8'b0001_0011;
+    parameter AMOUNT_VALID = 8'b0001_0100;
     parameter PRINT_RECEIPT = 8'b0001_0101;
 
     // Error Codes
@@ -58,12 +58,18 @@ module atm_module (
     parameter CARD_STATUS_IDX = 2;
     parameter CARD_LIMIT_IDX = 3;
 
-    // Initialize memory
+    integer output_file;
+    
     initial begin
         $readmemh("atm_data_g31.hex", card_data);
+        output_file = $fopen("output_data.txt", "w");
+        if (output_file == 0) begin
+            $display("Error: Could not open output_data.hex");
+            $finish;
+        end
     end
 
-    // Modified Sequential Logic Block
+    // Combined Sequential and State Transition Logic
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             current_state <= IDLE;
@@ -75,59 +81,85 @@ module atm_module (
             stored_pin <= 16'h0000;
             daily_limit <= 16'h0000;
             pin_valid <= 0;
+            next_state <= IDLE;
         end else begin
             current_state <= next_state;
             
             case (current_state)
+                IDLE: begin
+                    if (card_inserted)
+                        next_state <= CARD_INSERT;
+                end
+
                 CARD_INSERT: begin
                     current_card_number <= card_number_input;
                     error_code <= NO_ERROR;
                     transaction_success <= 0;
-                    pin_attempts <= 0; // Reset attempts on new card
+                    pin_attempts <= 0;
+                    next_state <= CARD_VALIDATE;
                 end
 
                 CARD_VALIDATE: begin
                     if (card_data[current_card_number*4 + CARD_STATUS_IDX] != 16'h0001) begin
                         error_code <= INVALID_CARD;
+                        next_state <= CARD_ERROR;
                     end else begin
                         stored_pin <= card_data[current_card_number*4 + CARD_PIN_IDX];
                         daily_limit <= card_data[current_card_number*4 + CARD_LIMIT_IDX];
                         error_code <= NO_ERROR;
+                        next_state <= CARD_VALID;
                     end
+                end
+
+                CARD_ERROR: begin
+                    if (!card_inserted)
+                        next_state <= IDLE;
+                end
+
+                CARD_VALID: begin
+                    next_state <= PIN_ENTRY;
+                end
+
+                PIN_ENTRY: begin
+                    next_state <= PIN_CHECK;
                 end
 
                 PIN_CHECK: begin
                     if (pin_input == stored_pin) begin
-                        next_state = PIN_VALID; // Go to new intermediate state
-                    end else if (pin_attempts >= 2) begin
-                        next_state = CARD_ERROR;
+                        next_state <= MENU;
+                        pin_valid <= 1;
                     end else begin
-                        next_state = PIN_ERROR;
+                        pin_attempts <= pin_attempts + 1;
+                        if (pin_attempts >= 2) begin
+                            next_state <= CARD_ERROR;
+                        end else begin
+                            next_state <= PIN_ERROR;
+                        end
                     end
                 end
-                
-                PIN_VALID: begin // New state handler
-                    next_state = MENU;
+
+                PIN_ERROR: begin
+                    next_state <= PIN_ENTRY;
                 end
-                
+
                 MENU: begin
-                    if (!card_inserted) // Add exit condition
-                        next_state = IDLE;
+                    if (!card_inserted)
+                        next_state <= IDLE;
                     else if (balance_req)
-                        next_state = BALANCE_ENQ;
+                        next_state <= BALANCE_ENQ;
                     else if (withdrawal_req)
-                        next_state = WITHDRAWAL;
+                        next_state <= WITHDRAWAL;
                     else if (deposit_req)
-                        next_state = DEPOSIT;
+                        next_state <= DEPOSIT;
                     else if (pin_change_req)
-                        next_state = PIN_CHANGE;
+                        next_state <= PIN_CHANGE;
                 end
-                
+
                 BALANCE_ENQ: begin
-                    // Fix: Read balance using proper array indexing
                     balance <= card_data[current_card_number*4 + CARD_BALANCE_IDX];
                     if (transaction_done) begin
                         transaction_success <= 1;
+                        next_state <= PRINT_RECEIPT;
                     end
                 end
 
@@ -135,151 +167,58 @@ module atm_module (
                     if (amount <= card_data[current_card_number*4 + CARD_BALANCE_IDX] &&
                         amount <= daily_limit) begin
                         if (transaction_done) begin
-                            // Fix: Update balance first, then update card data
                             balance <= card_data[current_card_number*4 + CARD_BALANCE_IDX] - amount;
                             card_data[current_card_number*4 + CARD_BALANCE_IDX] <= 
                                 card_data[current_card_number*4 + CARD_BALANCE_IDX] - amount;
                             transaction_success <= 1;
                             error_code <= NO_ERROR;
+                            next_state <= AMOUNT_VALID;
                         end
-                    end else if (amount > daily_limit) begin
-                        error_code <= LIMIT_EXCEED;
                     end else begin
-                        error_code <= INSUF_BALANCE;
+                        if (amount > daily_limit)
+                            error_code <= LIMIT_EXCEED;
+                        else
+                            error_code <= INSUF_BALANCE;
+                        next_state <= MENU;
                     end
                 end
 
                 DEPOSIT: begin
                     if (transaction_done) begin
-                        // Fix: Update balance first, then update card data
                         balance <= card_data[current_card_number*4 + CARD_BALANCE_IDX] + amount;
                         card_data[current_card_number*4 + CARD_BALANCE_IDX] <= 
                             card_data[current_card_number*4 + CARD_BALANCE_IDX] + amount;
                         transaction_success <= 1;
                         error_code <= NO_ERROR;
+                        next_state <= AMOUNT_VALID;
                     end
                 end
-                                
+
                 PIN_CHANGE: begin
                     if (!card_inserted)
-                        next_state = IDLE;
+                        next_state <= IDLE;
                     else if (transaction_done)
-                        next_state = MENU;
+                        next_state <= MENU;
                 end
-                
+
                 AMOUNT_VALID: begin
                     if (!card_inserted)
-                        next_state = IDLE;
+                        next_state <= IDLE;
                     else if (transaction_done)
-                        next_state = PRINT_RECEIPT;
+                        next_state <= PRINT_RECEIPT;
                 end
-                
+
                 PRINT_RECEIPT: begin
                     if (!card_inserted)
-                        next_state = IDLE;
+                        next_state <= IDLE;
                     else
-                        next_state = MENU;
+                        next_state <= MENU;
+                    $fwrite(output_file, "%b\n", balance);
+                    $fwrite(output_file, "%b\n", error_code);
                 end
-                
-                default: next_state = IDLE;
+
+                default: next_state <= IDLE;
             endcase
         end
-    end
-
-    // Modified Combinational Logic Block - Key Changes
-    always @(*) begin
-        next_state = current_state;
-
-        case (current_state)
-            IDLE: begin
-                if (card_inserted)
-                    next_state = CARD_INSERT;
-            end
-
-            CARD_INSERT: begin
-                next_state = CARD_VALIDATE;
-            end
-
-            CARD_VALIDATE: begin
-                if (card_data[current_card_number][CARD_STATUS_IDX] == 16'h0001)
-                    next_state = CARD_VALID;
-                else
-                    next_state = CARD_ERROR;
-            end
-
-            CARD_ERROR: begin
-                if (!card_inserted)
-                    next_state = IDLE;
-            end
-
-            CARD_VALID: begin
-                next_state = PIN_ENTRY;
-            end
-
-            PIN_ENTRY: begin
-                next_state = PIN_CHECK;
-            end
-
-            PIN_CHECK: begin
-                if (pin_input == stored_pin) begin
-                    next_state = MENU;
-                    pin_valid = 1;
-                end else if (pin_attempts >= 2) begin // Check for 2 since increment happens after
-                    next_state = CARD_ERROR;
-                end else begin
-                    next_state = PIN_ERROR;
-                end
-            end
-
-            PIN_ERROR: begin
-                next_state = PIN_ENTRY;
-            end
-
-            MENU: begin
-                if (balance_req)
-                    next_state = BALANCE_ENQ;
-                else if (withdrawal_req)
-                    next_state = WITHDRAWAL;
-                else if (deposit_req)
-                    next_state = DEPOSIT;
-                else if (pin_change_req)
-                    next_state = PIN_CHANGE;
-            end
-
-            BALANCE_ENQ: begin
-                if (transaction_done)
-                    next_state = PRINT_RECEIPT;
-            end
-
-            WITHDRAWAL: begin
-                if (amount <= card_data[current_card_number][CARD_BALANCE_IDX] &&
-                    amount <= daily_limit) begin
-                    if (transaction_done)
-                        next_state = AMOUNT_VALID;
-                end else
-                    next_state = MENU;
-            end
-
-            DEPOSIT: begin
-                if (transaction_done)
-                    next_state = AMOUNT_VALID;
-            end
-
-            PIN_CHANGE: begin
-                if (transaction_done)
-                    next_state = MENU;
-            end
-
-            AMOUNT_VALID: begin
-                if (transaction_done)
-                    next_state = PRINT_RECEIPT;
-            end
-
-            PRINT_RECEIPT: begin
-                next_state = MENU;
-            end
-
-            default: next_state = IDLE;
-        endcase
     end
 endmodule
