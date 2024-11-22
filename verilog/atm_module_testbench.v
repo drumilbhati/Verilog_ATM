@@ -19,7 +19,7 @@ module tb_atm_module;
     wire [7:0] error_code;
 
     // Register to store the transaction type
-    reg [31:0] transaction_type;
+    reg [8*16-1:0] transaction_type; // 16 characters × 8 bits per character
 
     // Instantiate the ATM module
     atm_module uut (
